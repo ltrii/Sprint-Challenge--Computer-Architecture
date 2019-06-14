@@ -88,7 +88,15 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
     }
     cpu->fl = flag;
     break;
-
+  case ALU_AND:
+    cpu->registers[regA] = valueA & valueB;
+    break;
+  case ALU_OR:
+    cpu->registers[regA] = valueA | valueB;
+    break;
+  case ALU_XOR:
+    cpu->registers[regA] = valueA ^ valueB;
+    break;
     // TODO: implement more ALU ops
   }
 }
@@ -148,11 +156,8 @@ void cpu_run(struct cpu *cpu)
     case CMP:
       alu(cpu, ALU_CMP, opA, opB);
       break;
-    case JMP:
-      cpu->pc = cpu->registers[opA];
-      break;
-    case JNE:
-      if ((cpu->fl & 0b00000001) == 0)
+    case JEQ:
+      if (cpu->fl == 1)
       {
         cpu->pc = cpu->registers[opA];
       }
@@ -160,13 +165,31 @@ void cpu_run(struct cpu *cpu)
       {
         cpu->pc += 2;
       }
+      break;
+    case JMP:
+      cpu->pc = cpu->registers[opA];
+      break;
+    case JNE:
+      if((cpu->fl & 0b00000001) == 0)
+      {
+        cpu->pc = cpu->registers[opA];
+      }
+      else
+      {
+        cpu->pc += 2;
+      }
+    case AND:
+      alu(cpu, ALU_AND, opA, opB);
+    case XOR:
+      alu(cpu, ALU_MUL, opA, opB);
+      break;
     default:
       printf("unexpected instruction 0x%02X at 0x%02X\n", ir, cpu->pc);
       exit(1);
       break;
     }
 
-    if ((0b11000000 & ir) >> 6 == 1 && ir != CALL && ir != RET)
+    if ((0b11000000 & ir) >> 6 == 1 && ir != CALL && ir != RET && ir != JMP && ir != JEQ && ir != JNE)
     {
       cpu->pc += 2;
     }

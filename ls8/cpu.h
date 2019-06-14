@@ -17,7 +17,10 @@ enum alu_op
 {
   ALU_MUL,
   ALU_ADD,
-  ALU_CMP
+  ALU_CMP,
+  ALU_OR,
+  ALU_XOR,
+  ALU_AND
 
   // Add more here
 };
@@ -40,6 +43,10 @@ enum alu_op
 #define JEQ 0b01010101
 #define JNE 0b01010110
 #define JMP 0b01010100
+#define OR 0b10101010
+#define XOR 0b10101011
+#define AND 0b10101000
+
 
 // TODO: more instructions here. These can be used in cpu_run().
 
